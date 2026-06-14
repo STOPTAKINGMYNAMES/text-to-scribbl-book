@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TXT to Scribbl Book</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:30px;
+    background:linear-gradient(135deg,#1a1b1e,#2b2d31);
+    font-family:"Segoe UI",sans-serif;
+    color:white;
+}
+
+.container{
+    width:100%;
+    max-width:950px;
+    background:#313338;
+    border:1px solid #4f545c;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 15px 40px rgba(0,0,0,.45);
+}
+
+h1{
+    text-align:center;
+    color:#7df57d;
+    margin-bottom:8px;
+    font-size:2.2rem;
+}
+
+.subtitle{
+    text-align:center;
+    color:#b5bac1;
+    margin-bottom:20px;
+}
+
+textarea{
+    width:100%;
+    height:350px;
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    background:#1e1f22;
+    color:white;
+    font-family:Consolas,monospace;
+    font-size:14px;
+    resize:vertical;
+    outline:none;
+    border:2px solid transparent;
+    transition:.2s;
+}
+
+textarea:focus{
+    border-color:#7df57d;
+}
+
+.buttons{
+    display:flex;
+    gap:12px;
+    margin-top:15px;
+}
+
+button{
+    border:none;
+    border-radius:12px;
+    padding:12px 18px;
+    font-size:15px;
+    font-weight:700;
+    color:#111;
+    cursor:pointer;
+    transition:.2s;
+    appearance:none;
+    -webkit-appearance:none;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.generate{
+    background:#7df57d;
+}
+
+.generate:hover{
+    background:#68e868;
+}
+
+.download{
+    background:#6cb8ff;
+    color:#111;
+    display:none;
+}
+
+.download:hover{
+    background:#55a8f7;
+}
+
+.status{
+    margin-top:15px;
+    color:#b5bac1;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>TXT to Scribbl Book</h1>
+    <p class="subtitle">Convert plain text into Scribbl book JSON</p>
+
+    <textarea id="textInput" placeholder="Type or paste your text here..."></textarea>
+
+    <div class="buttons">
+        <button class="generate" onclick="generateBook()">Generate JSON</button>
+        <button class="download" id="downloadBtn" onclick="downloadJSON()">Download JSON</button>
+    </div>
+
+    <div class="status" id="status">Ready.</div>
+</div>
+
+<script>
+let generatedJSON = "";
+
+function generateBook() {
+    const text = document.getElementById("textInput").value;
+
+    const pages = text.split(/\r?\n/).map(line =>
+        line
+            .replace(/\\/g, "\\\\")
+            .replace(/"/g, '\\"')
+    );
+
+    generatedJSON = JSON.stringify({
+        author: "",
+        pages: pages
+    }, null, 4);
+
+    document.getElementById("downloadBtn").style.display = "inline-block";
+    document.getElementById("status").textContent =
+        `Generated JSON with ${pages.length} page${pages.length !== 1 ? "s" : ""}.`;
+}
+
+function downloadJSON() {
+    const blob = new Blob([generatedJSON], {
+        type: "application/json"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "scribbl_book.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
